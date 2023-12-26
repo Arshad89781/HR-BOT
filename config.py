@@ -1,0 +1,5 @@
+PINECONE_API_KEY = "765789ec-4ce4-4858-be09-31128f07c5f5"
+PINECONE_API_ENV = "gcp-starter"
+PDF_DATA_PATH = r"D:\HR-bot\HR-BOT\data"
+EMBEDDING_MODEL_PATH = r"D:\HR-bot\HR-BOT\models\embedding"
+INDEX_NAME="hr-bot"
