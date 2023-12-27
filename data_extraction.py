@@ -32,12 +32,11 @@ class PDFTextExtractor:
         return text_chunks
 
 class PineconeVectorDatabase:
-    def __init__(self,text_chunks):
+    def __init__(self):
         self.api_key=PINECONE_API_KEY
         self.environment=PINECONE_API_ENV
-        self.text_chunks = text_chunks
 
-    def store_vector(self):
+    def store_vector(self,text_chunks):
         embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_PATH)
 
 
@@ -49,4 +48,13 @@ class PineconeVectorDatabase:
             pinecone.create_index(name=INDEX_NAME, metric="cosine", dimension=384)
 
         #Creating Embeddings for Each of The Text Chunks & storing
-        docsearch=Pinecone.from_texts([t.page_content for t in self.text_chunks], embeddings,metadatas=[{'pdf_name': p.metadata["source"].split("\\")[-1].lower()} for p in self.text_chunks], index_name=INDEX_NAME)
+        docsearch=Pinecone.from_texts([t.page_content for t in text_chunks], embeddings,metadatas=[{'pdf_name': p.metadata["source"].split("\\")[-1].lower()} for p in text_chunks], index_name=INDEX_NAME)
+
+    #download embedding model
+    def fetch_vectors(self):
+        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        #Initializing the Pinecone
+        pinecone.init(api_key=PINECONE_API_KEY,
+                    environment=PINECONE_API_ENV)
+        docsearch=Pinecone.from_existing_index(INDEX_NAME, embeddings)
+        return docsearch

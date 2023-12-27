@@ -1,6 +1,6 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile,Query
 from fastapi.responses import JSONResponse
-from pipeline import ExtractionAndVectorStoringTask
+from pipeline import ExtractionAndVectorStoringTask,ResponseTask
 from config import PDF_DATA_PATH
 import os
 
@@ -29,6 +29,12 @@ async def upload_pdf(file: UploadFile = File(...)):
         return JSONResponse(content={"message": "PDF uploaded successfully"}, status_code=200)
     else:
         return JSONResponse(content={"error": "Invalid file format. Please upload a PDF."}, status_code=400)
+
+@app.get("/response/")
+def read_root(queation: str = Query(..., description="Your queation")):
+    qa = ResponseTask(query=queation)
+    
+    return {"message": qa.get_response()}
 
 if __name__ == "__main__":
     import webbrowser

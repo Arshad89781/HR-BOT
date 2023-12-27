@@ -1,4 +1,5 @@
 from data_extraction import PDFTextExtractor,PineconeVectorDatabase
+from model_response import LLMResponse
 
 class ExtractionAndVectorStoringTask:
     def __init__(self, folder_path):
@@ -6,7 +7,14 @@ class ExtractionAndVectorStoringTask:
 
     def vector_storing(self):
         text_extractor = PDFTextExtractor(folder_path=self.folder_path)
-        text_data = text_extractor.extract_text()
+        VectorData = PineconeVectorDatabase()
+        VectorData.store_vector(text_chunks=text_extractor.extract_text())
 
-        VectorData = PineconeVectorDatabase(text_chunks=text_data)
-        VectorData.store_vector()
+class ResponseTask:
+    def __init__(self, query):
+        self.query = query
+    def get_response(self):
+        VectorData = PineconeVectorDatabase()
+        doc_vectors = VectorData.fetch_vectors()
+        response = LLMResponse(query=self.query,docsearch=doc_vectors)
+        return response.query_response()
