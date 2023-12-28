@@ -12,13 +12,13 @@ def read_root():
     print("hellll")
     return {"Hello": "World"}
 
-
 @app.post("/upload_pdf/")
 async def upload_pdf(file: UploadFile = File(...)):
     # Check if the file is a PDF
     if file.filename.endswith('.pdf'):
         file_location = os.path.join(PDF_DATA_PATH, file.filename)
-        
+        if os.path.exists(file_location):
+            return JSONResponse(content={"message": "PDF already exists."}, status_code=200)
         # Save the uploaded PDF to the specified folder
         with open(file_location, "wb") as buffer:
             buffer.write(file.file.read())
